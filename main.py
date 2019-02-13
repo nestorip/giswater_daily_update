@@ -11,6 +11,9 @@ import datetime
 import os
 import smtplib
 
+from psycopg2._psycopg import ProgrammingError
+
+
 class DailyUpdate():
     def __init__(self):
         self.cursor = None
@@ -29,6 +32,7 @@ class DailyUpdate():
     def set_db_conection(self):
         # Read the connection data to our server and return cursor
         # Read the config file
+
         config = configparser.ConfigParser()
         ruta = os.getcwd()
         ruta = ruta + "/config.conf"
@@ -58,14 +62,16 @@ class DailyUpdate():
             result = self.cursor.fetchone()
             self.cursor.execute("commit")
             return result
-        except:
-            return ["Function gw_fct_utils_daily_update() probably do not exist."]
+        except ProgrammingError as e:
+            return ["An exception has occurred: {e} \n".format(e=e)]
+        except Exception as e:
+            print(type(e).__name__)
+            return ["An exception has occurred: {e}".format(e=e)]
 
 
     def create_body_mail(self, result, time_start):
         time_end = datetime.datetime.now()
         time_end = time_end.strftime('%d/%m/%y %H:%M:%S')
-        print(result)
         # Get date from datetime string
         datetime_obj = datetime.datetime.strptime(time_start, '%d/%m/%y %H:%M:%S').date()
         if result[0] == 0:
@@ -83,7 +89,7 @@ class DailyUpdate():
 
             if result[0] == 0:
                 msg_content = '<h5>{body}<font color="green">Proceso realizado correctamente</font></h2>\n'.format(body=body)
-            elif "gw_fct_utils_daily_update" in result[0]:
+            elif "An exception has occurred" in result[0]:
                 msg_content = '<h5>{body}<font color="red">El proceso no se ha realizado correctamente, consulta log de postgre para mas informacion</font></h2>\n' \
                               '{result}'.format(body=body, result=result[0])
             else:
