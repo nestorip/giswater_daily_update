@@ -1,0 +1,19 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
+#################
+## Project
+#################
+
+*.qgs
+*.qgs~
+*.bat
+*.db
+test
+
+build/
+dist/
+__pycahce__/
+.idea/
+
+*.spec
+*.csv
+*.ods
