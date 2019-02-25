@@ -48,7 +48,6 @@ class DailyUpdate():
         self.domain = config.get("Remitente", "dominio")
         self.remitente = config.get("Remitente", "sendFrom")
         self.passremitente = config.get("Remitente", "pass_sender")
-        self.use_ssl = config.get("Remitente", "use_ssl")
         conn = psycopg2.connect(database=self.dbName, user=self.dbUsername, password=self.dbPassword,
                                 host=self.dbHostName)
         cursor = conn.cursor()
@@ -102,31 +101,16 @@ class DailyUpdate():
 
     def send_mail(self, mail_address, msg_content):
         """ Send mail to """
-        if self.use_ssl in ['None', '', None]:
-            server = smtplib.SMTP(self.domain, self.domainport)
-        else:
-            server = smtplib.SMTP_SSL(self.domain, self.domainport)
+        server = smtplib.SMTP(self.domain, self.domainport)
+        server.starttls()
+        server.login(self.remitente, self.passremitente)
 
-        try:
-            #server.set_debuglevel(True)
-
-            # identify ourselves, prompting server for supported features
-            server.ehlo()
-            # If we can encrypt this session, do it
-            if server.has_extn('STARTTLS'):
-                server.starttls()
-                server.ehlo()  # reidentify ourselves over TLS connection
-
-            if server.has_extn('AUTH'):
-                server.login(self.remitente, self.passremitente)
-
-            server.sendmail(self.remitente, mail_address, msg_content)
-        finally:
-            server.quit()
+        server.sendmail(self.remitente, mail_address, msg_content)
+        server.quit()
 
 
     def getMailsTo(self):
-        """ Return the list of mails in the table my_database.config_param_system """
+        """ Return the list of mails in the table llicamunt.config_param_system """
         # Get the datetime from Gui
         conn = psycopg2.connect(database=self.dbName, user=self.dbUsername, password=self.dbPassword,
                                 host=self.dbHostName)
