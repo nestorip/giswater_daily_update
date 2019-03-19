@@ -83,7 +83,7 @@ class DailyUpdate():
                          'To: Receiver Name <' + self.mails_to[x] + '>\n' \
                          'MIME-Version: 1.0\n' \
                          'Content-type: text/html\n' \
-                         'Subject: PostgreSql Daily update rapport. Result: <'+str(res)+'>\n' \
+                         'Subject: PostgreSql Daily update rapport. Result: <'+str(res)+'>\n\n' \
                          + str("Rapport for date "+str(datetime_obj))
             body = ' Hora inicio: ' + str(time_start) + '<br>Hora final: ' + str(time_end) + '<br>'
 
